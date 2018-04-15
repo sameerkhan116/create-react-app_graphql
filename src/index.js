@@ -5,6 +5,7 @@ import {ApolloProvider} from "react-apollo";
 import {createHttpLink} from 'apollo-link-http';
 import {setContext} from 'apollo-link-context';
 import {InMemoryCache} from 'apollo-cache-inmemory';
+import { ApolloLink } from "apollo-link";
 
 import 'antd/dist/antd.css';
 
@@ -27,8 +28,27 @@ const authLink = setContext((_, {headers}) => {
   }
 });
 
+const afterwareLink = new ApolloLink((operation, forward) => {
+  return forward(operation).map(res => {
+    const context = operation.getContext();
+    const { response: { headers } } = context;
+    console.log(headers.get('x-token'));
+    const token = headers.get('x-token');
+    const refreshToken = headers.get('x-refresh-token');
+    if(token) {
+      localStorage.setItem('token', token);
+    }
+    if(refreshToken) {
+      localStorage.setItem('refreshToken', token);
+    }
+    return res;
+  })
+});
+
+const link = authLink.concat(afterwareLink).concat(httpLink);
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link,
   cache: new InMemoryCache()
 });
 
