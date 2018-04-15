@@ -11,7 +11,7 @@ import 'antd/dist/antd.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
-const httpLink = createHttpLink({uri: 'http://localhost:4000/graphql', credentials: 'same-origin'});
+const httpLink = createHttpLink({uri: 'http://localhost:4000/graphql'});
 
 // get the authentication token from local storage if it exists return the
 // headers to the context so httpLink can read them
